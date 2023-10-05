@@ -65,21 +65,33 @@
                     .attr("x2", scaleX(-1))
                     .attr("y2", scaleY(-5))
                     .attr("stroke", "#63a4ff")
-                    .attr("stroke-width", 1);
+                    .attr("stroke-width", 3);
             }
         }
 
         function drawContour(f, g, h) {
-            // Calculate the endpoints for the line f*y + g*x = h
-            const y1 = (-g * (-5) + h) / f;
-            const y2 = (-g * 5 + h) / f;
-            svg.append("line")
-                .attr("x1", scaleX(-5))
-                .attr("y1", scaleY(y1))
-                .attr("x2", scaleX(5))
-                .attr("y2", scaleY(y2))
-                .attr("stroke", "#FF5733")
-                .attr("stroke-width", 2);
+            if (f !== 0) {
+                // Calculate the endpoints for the line f*y + g*x = h
+                const y1 = (-g * (-5) + h) / f;
+                const y2 = (-g * 5 + h) / f;
+                svg.append("line")
+                    .attr("x1", scaleX(-5))
+                    .attr("y1", scaleY(y1))
+                    .attr("x2", scaleX(5))
+                    .attr("y2", scaleY(y2))
+                    .attr("stroke", "#FF5733")
+                    .attr("stroke-width", 2);
+            } else if (g !== 0) {
+                // If f is 0, then the equation is g*x = h or x = h/g (vertical line)
+                const xValue = h / g;
+                svg.append("line")
+                    .attr("x1", scaleX(xValue))
+                    .attr("y1", scaleY(5))
+                    .attr("x2", scaleX(xValue))
+                    .attr("y2", scaleY(-5))
+                    .attr("stroke", "#FF5733")
+                    .attr("stroke-width", 2);
+            }
         }
 
         function updatePlot() {
