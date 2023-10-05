@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perspective Plot</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        svg {
+            border: 1px solid;
+        }
+    </style>
+</head>
+
+<body>
+    The following gives an animation of the perspective of a hyperplane in 2D with pinhole camera analogy.<br>
+    Red: hyperplane C<br>
+    Black dot: Origin/Pinhole of the Camera<br>
+    Dashed Line: -1 Line/Screen of the Camera<br>
+    Blue Set: Image of the hyperplane P(C)<br>
+
+    <!-- Sliders -->
+    f: <input type="range" id="fSlider" min="-1" max="1" step="0.01" value="1"><br>
+    g: <input type="range" id="gSlider" min="-1" max="1" step="0.01" value="0"><br>
+    h: <input type="range" id="hSlider" min="-1" max="1" step="0.01" value="1"><br>
+
+    <!-- SVG container -->
+    <svg width="500" height="500" id="plot"></svg>
+
+    <script>
+        const svg = d3.select("#plot");
+        const width = +svg.attr("width");
+        const height = +svg.attr("height");
+        const scaleX = d3.scaleLinear().domain([-5, 5]).range([0, width]);
+        const scaleY = d3.scaleLinear().domain([-5, 5]).range([height, 0]);
+
+        function perspective(f, g, h) {
+            if (h > 0 && f !== 0) {
+                svg.append("line")
+                    .attr("x1", scaleX(-1))
+                    .attr("y1", scaleY(g / f))
+                    .attr("x2", scaleX(-1))
+                    .attr("y2", scaleY(-5 * Math.sign(f)))
+                    .attr("stroke", "#63a4ff")
+                    .attr("stroke-width", 5);
+            } else if (h === 0 && f !== 0) {
+                svg.append("circle")
+                    .attr("cx", scaleX(-1))
+                    .attr("cy", scaleY(g / f))
+                    .attr("r", 5)
+                    .attr("fill", "#63a4ff");
+            } else if (h < 0 && f !== 0) {
+                svg.append("line")
+                    .attr("x1", scaleX(-1))
+                    .attr("y1", scaleY(g / f))
+                    .attr("x2", scaleX(-1))
+                    .attr("y2", scaleY(5 * Math.sign(f)))
+                    .attr("stroke", "#63a4ff")
+                    .attr("stroke-width", 5);
+            } else if ((g * h > 0) && (f === 0)) {
+                svg.append("line")
+                    .attr("x1", scaleX(-1))
+                    .attr("y1", scaleY(5))
+                    .attr("x2", scaleX(-1))
+                    .attr("y2", scaleY(-5))
+                    .attr("stroke", "#63a4ff")
+                    .attr("stroke-width", 1);
+            }
+        }
+
+        function drawContour(f, g, h) {
+            // Calculate the endpoints for the line f*y + g*x = h
+            const y1 = (-g * (-5) + h) / f;
+            const y2 = (-g * 5 + h) / f;
+            svg.append("line")
+                .attr("x1", scaleX(-5))
+                .attr("y1", scaleY(y1))
+                .attr("x2", scaleX(5))
+                .attr("y2", scaleY(y2))
+                .attr("stroke", "#FF5733")
+                .attr("stroke-width", 2);
+        }
+
+        function updatePlot() {
+            const f = +d3.select("#fSlider").node().value;
+            const g = +d3.select("#gSlider").node().value;
+            const h = +d3.select("#hSlider").node().value;
+
+            svg.selectAll("*").remove();
+
+            svg.append("line")
+                .attr("x1", scaleX(-1))
+                .attr("y1", scaleY(-5))
+                .attr("x2", scaleX(-1))
+                .attr("y2", scaleY(5))
+                .attr("stroke-dasharray", "5,5")
+                .attr("stroke", "black");
+
+            svg.append("circle")
+                .attr("cx", scaleX(0))
+                .attr("cy", scaleY(0))
+                .attr("r", 5)
+                .attr("fill", "black");
+
+            perspective(f, g, h);
+            drawContour(f, g, h);
+        }
+
+        d3.selectAll("input").on("input", updatePlot);
+        updatePlot();
+
+    </script>
+</body>
+
+</html>
