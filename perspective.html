@@ -94,6 +94,42 @@
             }
         }
 
+        function drawAxes() {
+            // Horizontal axis (t-axis)
+            svg.append("line")
+                .attr("x1", scaleX(-5))
+                .attr("y1", scaleY(0))
+                .attr("x2", scaleX(5))
+                .attr("y2", scaleY(0))
+                .attr("stroke", "gray")
+                .attr("stroke-width", 1);
+
+            // Vertical axis (v-axis)
+            svg.append("line")
+                .attr("x1", scaleX(0))
+                .attr("y1", scaleY(-5))
+                .attr("x2", scaleX(0))
+                .attr("y2", scaleY(5))
+                .attr("stroke", "gray")
+                .attr("stroke-width", 1);
+
+            // Label for t-axis
+            svg.append("text")
+                .attr("x", scaleX(4.8))
+                .attr("y", scaleY(0) - 5)
+                .attr("fill", "black")
+                .attr("font-size", "14px")
+                .text("t");
+
+            // Label for v-axis
+            svg.append("text")
+                .attr("x", scaleX(0) + 5)
+                .attr("y", scaleY(5) + 15)
+                .attr("fill", "black")
+                .attr("font-size", "14px")
+                .text("v");
+        }
+
         function updatePlot() {
             const f = +d3.select("#fSlider").node().value;
             const g = +d3.select("#gSlider").node().value;
@@ -101,6 +137,7 @@
 
             svg.selectAll("*").remove();
 
+            // Draw screen of the camera (dashed line at x = -1)
             svg.append("line")
                 .attr("x1", scaleX(-1))
                 .attr("y1", scaleY(-5))
@@ -109,12 +146,17 @@
                 .attr("stroke-dasharray", "5,5")
                 .attr("stroke", "black");
 
+            // Draw the pinhole (origin)
             svg.append("circle")
                 .attr("cx", scaleX(0))
                 .attr("cy", scaleY(0))
                 .attr("r", 5)
                 .attr("fill", "black");
 
+            // Draw axes with labels
+            drawAxes();
+
+            // Draw perspective and hyperplane contour
             perspective(f, g, h);
             drawContour(f, g, h);
         }
